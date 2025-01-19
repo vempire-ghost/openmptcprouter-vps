@@ -96,9 +96,9 @@ SHADOWSOCKS_BINARY_VERSION="3.3.5-3"
 SHADOWSOCKS_GO_VERSION="1.11.3"
 DEFAULT_USER="openmptcprouter"
 VPS_DOMAIN=${VPS_DOMAIN:-$(wget -4 -qO- -T 2 http://hostname.openmptcprouter.com)}
-VPSPATH="server-test"
+VPSPATH="vempire-ghost/openmptcprouter-vps"
 VPS_PUBLIC_IP=${VPS_PUBLIC_IP:-$(wget -4 -qO- -T 2 http://ip.openmptcprouter.com)}
-VPSURL="https://www.openmptcprouter.com/"
+VPSURL="https://github.com/"
 REPO="repo.openmptcprouter.com"
 CHINA=${CHINA:-no}
 
