@@ -212,7 +212,7 @@ fi
 		wget https://gitlab.com/ysurac/openmptcprouter-vps-debian/raw/main/openmptcprouter.gpg.key -O /etc/apt/trusted.gpg.d/openmptcprouter.gpg
 	else
 		#wget -O - https://${REPO}/openmptcprouter.gpg.key | apt-key add -
-		wget https://${REPO}/openmptcprouter.gpg.key -O /etc/apt/trusted.gpg.d/openmptcprouter.gpg
+		sudo cp var/spool/apt-mirror/mirror/repo.openmptcprouter.com/openmptcprouter.gpg.key /etc/apt/trusted.gpg.d/openmptcprouter.gpg
 	fi
 }
 
@@ -323,7 +323,7 @@ if [ "$CHINA" = "yes" ]; then
 	TLS="no"
 	DIR="/usr/share/omr-server-git"
 else
-	echo "deb [arch=amd64] https://${REPO} buster main" > /etc/apt/sources.list.d/openmptcprouter.list
+	echo "deb [trusted=yes] file:///var/spool/apt-mirror/mirror/repo.openmptcprouter.com/ buster main" > /etc/apt/sources.list.d/openmptcprouter.list
 	cat <<-EOF | tee /etc/apt/preferences.d/openmptcprouter.pref
 		Explanation: Prefer OpenMPTCProuter provided packages over the Debian native ones
 		Package: *
@@ -331,7 +331,7 @@ else
 		Pin-Priority: 1001
 	EOF
 	if [ -n "$(echo $OMR_VERSION | grep test)" ]; then
-		echo "deb [arch=amd64] https://${REPO} next main" > /etc/apt/sources.list.d/openmptcprouter-test.list
+		echo "deb [trusted=yes] file:///var/spool/apt-mirror/mirror/repo.openmptcprouter.com/ next main" > /etc/apt/sources.list.d/openmptcprouter-test.list
 #		cat <<-EOF | tee -a /etc/apt/preferences.d/openmptcprouter.pref
 #			Explanation: Prefer OpenMPTCProuter provided packages over the Debian native ones
 #			Package: *
@@ -350,7 +350,7 @@ else
 		EOF
 	fi
 	#wget -O - https://${REPO}/openmptcprouter.gpg.key | apt-key add -
-	wget https://${REPO}/openmptcprouter.gpg.key -O /etc/apt/trusted.gpg.d/openmptcprouter.gpg
+	sudo cp var/spool/apt-mirror/mirror/repo.openmptcprouter.com/openmptcprouter.gpg.key /etc/apt/trusted.gpg.d/openmptcprouter.gpg
 fi
 
 #apt-key adv --keyserver hkp://keys.gnupg.net --recv-keys 379CE192D401AB61
