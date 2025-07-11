@@ -128,7 +128,7 @@ if test -f /etc/os-release ; then
 else
 	. /usr/lib/os-release
 fi
-if [ "$ID" = "debian" ] && [ "$VERSION_ID" != "9" ] && [ "$VERSION_ID" != "10" ] && [ "$VERSION_ID" != "11" ] && [ "$VERSION_ID" != "12" ] && [ "$VERSION_ID" != "13" ]; then
+if [ "$ID" = "debian" ] && [ "$VERSION_ID" != "9" ] && [ "$VERSION_ID" != "10" ] && [ "$VERSION_ID" != "11" ] && [ "$VERSION_ID" != "13" ] && [ "$VERSION_ID" != "13" ]; then
 	echo "This script only works with Debian Stretch (9.x), Buster (10.x), Bullseye (11.x), Bookworm (12.x), or Trixie (13.x)"
 	exit 1
 elif [ "$ID" = "ubuntu" ] && [ "$VERSION_ID" != "18.04" ] && [ "$VERSION_ID" != "19.04" ] && [ "$VERSION_ID" != "20.04" ] && [ "$VERSION_ID" != "22.04" ]; then
@@ -265,7 +265,7 @@ if [ "$ID" = "debian" ] && [ "$VERSION_ID" = "11" ] && [ "$UPDATE_OS" = "yes" ] 
 	apt-get update --allow-releaseinfo-change
 	apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" --allow-downgrades upgrade
 	apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" --allow-downgrades dist-upgrade
-	VERSION_ID="12"
+	VERSION_ID="13"
 fi
 if [ "$ID" = "ubuntu" ] && [ "$VERSION_ID" = "18.04" ] && [ "$UPDATE_OS" = "yes" ]; then
 	echo "Update Ubuntu 18.04 to Ubuntu 20.04"
@@ -339,7 +339,7 @@ else
 	else
 		rm -f /etc/apt/sources.list.d/openmptcprouter-test.list
 	fi
-	if [ "$ID" = "debian" ] && ([ "$VERSION_ID" = "11" ] || [ "$VERSION_ID" = "12" ]); then
+	if [ "$ID" = "debian" ] && ([ "$VERSION_ID" = "11" ] || [ "$VERSION_ID" = "13" ]); then
 		cat <<-EOF | tee -a /etc/apt/preferences.d/openmptcprouter.pref
 			Explanation: Prefer libuv1 Debian native package
 			Package: libuv1
@@ -359,7 +359,7 @@ if [ "$ID" = "debian" ]; then
 	fi
 	# Add buster-backports repo
 	echo 'deb http://archive.debian.org/debian buster-backports main' > /etc/apt/sources.list.d/buster-backports.list
-	if [ "$VERSION_ID" = "12" ]; then
+	if [ "$VERSION_ID" = "13" ]; then
 		echo 'deb http://deb.debian.org/debian bullseye main' > /etc/apt/sources.list.d/bullseye.list
 	fi
 elif [ "$ID" = "ubuntu" ]; then
@@ -567,7 +567,7 @@ if [ "$KERNEL" != "5.4" ]; then
 	make install
 	cd /tmp
 	rm -rf /tmp/mptcpize
-	if [ "$ID" = "debian" ] && [ "$VERSION_ID" = "12" ]; then
+	if [ "$ID" = "debian" ] && [ "$VERSION_ID" = "13" ]; then
 		apt-get -y install iproute2
 	else
 		echo "Compile and install iproute2..."
@@ -773,8 +773,8 @@ if [ "$OMR_ADMIN" = "yes" ]; then
 		apt-get -y remove python3-jwt
 		pip3 -q install pyjwt
 	else
-		if [ "$ID" = "debian" ] && ([ "$VERSION_ID" = "10" ] || [ "$VERSION_ID" = "11" ] || [ "$VERSION_ID" = "12" ]); then
-			if [ "$VERSION_ID" = "12" ]; then
+		if [ "$ID" = "debian" ] && ([ "$VERSION_ID" = "10" ] || [ "$VERSION_ID" = "11" ] || [ "$VERSION_ID" = "13" ]); then
+			if [ "$VERSION_ID" = "13" ]; then
 				apt-get -y --allow-downgrades install python3-passlib python3-jwt python3-netaddr libuv1
 				pip3 -q install uvloop --break-system-packages
 			else
@@ -790,7 +790,7 @@ if [ "$OMR_ADMIN" = "yes" ]; then
 	echo "If you see any error here, I really don't care: it's about a module not used for home users"
 	#pip3 install pyjwt passlib uvicorn fastapi netjsonconfig python-multipart netaddr
 	#pip3 -q install fastapi netjsonconfig python-multipart uvicorn -U
-	if [ "$ID" = "debian" ] && [ "$VERSION_ID" = "12" ]; then
+	if [ "$ID" = "debian" ] && [ "$VERSION_ID" = "13" ]; then
 		#pip3 -q install netjsonconfig --break-system-packages
 		pip3 -q install fastapi -U --break-system-packages
 		pip3 -q install jsonschema -U --break-system-packages
