@@ -128,8 +128,8 @@ if test -f /etc/os-release ; then
 else
 	. /usr/lib/os-release
 fi
-if [ "$ID" = "debian" ] && [ "$VERSION_ID" != "9" ] && [ "$VERSION_ID" != "10" ] && [ "$VERSION_ID" != "11" ] && [ "$VERSION_ID" != "13" ] && [ "$VERSION_ID" != "13" ]; then
-	echo "This script only works with Debian Stretch (9.x), Buster (10.x), Bullseye (11.x), Bookworm (12.x), or Trixie (13.x)"
+if [ "$ID" = "debian" ] && [ "$VERSION_ID" != "9" ] && [ "$VERSION_ID" != "10" ] && [ "$VERSION_ID" != "11" ] && [ "$VERSION_ID" != "12" ] && [ "$VERSION_ID" != "13" ]; then
+	echo "This script only work with Debian Stretch (9.x), Debian Buster (10.x), Debian Bullseye (11.x), Debian Bookworm (12.x) or Debian Trixie (13.x)"
 	exit 1
 elif [ "$ID" = "ubuntu" ] && [ "$VERSION_ID" != "18.04" ] && [ "$VERSION_ID" != "19.04" ] && [ "$VERSION_ID" != "20.04" ] && [ "$VERSION_ID" != "22.04" ]; then
 	echo "This script only work with Ubuntu 18.04, 19.04, 20.04 or 22.04"
@@ -206,7 +206,7 @@ fi
 # Force update key
 [ -f /etc/apt/sources.list.d/openmptcprouter.list ] && {
 	echo "Update ${REPO} key"
-	apt-key del '2FDF 70C8 228B 7F04 42FE  59F6 608F D17B 2B24 D936' >/dev/null 2>&1
+	apt-key del '2FDF 70C8 228B 7F04 42FE  59F6 608F D17B 2B24 D936' >/dev/null 2>&1 || true
 	if [ "$CHINA" = "yes" ]; then
 		#wget -O - https://gitee.com/ysurac/openmptcprouter-vps-debian/raw/main/openmptcprouter.gpg.key | apt-key add -
 		wget https://gitlab.com/ysurac/openmptcprouter-vps-debian/raw/main/openmptcprouter.gpg.key -O /etc/apt/trusted.gpg.d/openmptcprouter.gpg
@@ -262,6 +262,19 @@ if [ "$ID" = "debian" ] && [ "$VERSION_ID" = "11" ] && [ "$UPDATE_OS" = "yes" ] 
 	apt-get -y -f --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" --allow-downgrades upgrade
 	apt-get -y -f --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" --allow-downgrades dist-upgrade
 	sed -i 's:bullseye:bookworm:g' /etc/apt/sources.list
+	apt-get update --allow-releaseinfo-change
+	apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" --allow-downgrades upgrade
+	apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" --allow-downgrades dist-upgrade
+	VERSION_ID="12"
+fi
+if [ "$ID" = "debian" ] && [ "$VERSION_ID" = "12" ] && [ "$UPDATE_OS" = "yes" ] && false; then
+	echo "Update Debian 12 Bookworm to Debian 13 Trixie"
+	apt-get -y -f --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" --allow-downgrades upgrade
+	apt-get -y -f --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" --allow-downgrades dist-upgrade
+	sed -i 's:archive:deb:g' /etc/apt/sources.list
+	sed -i 's:bookworm:trixie:g' /etc/apt/sources.list
+	sed -i 's:archive:deb:g' /etc/apt/sources.list.d/debian.sources
+	sed -i 's:bookworm:trixie:g' /etc/apt/sources.list.d/debian.sources
 	apt-get update --allow-releaseinfo-change
 	apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" --allow-downgrades upgrade
 	apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" --allow-downgrades dist-upgrade
@@ -339,7 +352,7 @@ else
 	else
 		rm -f /etc/apt/sources.list.d/openmptcprouter-test.list
 	fi
-	if [ "$ID" = "debian" ] && ([ "$VERSION_ID" = "11" ] || [ "$VERSION_ID" = "13" ]); then
+	if [ "$ID" = "debian" ] && ([ "$VERSION_ID" = "11" ] || [ "$VERSION_ID" = "12" ] || [ "$VERSION_ID" = "13" ]); then
 		cat <<-EOF | tee -a /etc/apt/preferences.d/openmptcprouter.pref
 			Explanation: Prefer libuv1 Debian native package
 			Package: libuv1
@@ -359,7 +372,7 @@ if [ "$ID" = "debian" ]; then
 	fi
 	# Add buster-backports repo
 	echo 'deb http://archive.debian.org/debian buster-backports main' > /etc/apt/sources.list.d/buster-backports.list
-	if [ "$VERSION_ID" = "13" ]; then
+	if [ "$VERSION_ID" = "12" ] || [ "$VERSION_ID" = "13" ]; then
 		echo 'deb http://deb.debian.org/debian bullseye main' > /etc/apt/sources.list.d/bullseye.list
 	fi
 elif [ "$ID" = "ubuntu" ]; then
@@ -374,7 +387,11 @@ fi
 echo "Install mptcp kernel and shadowsocks..."
 apt-get update --allow-releaseinfo-change
 sleep 2
-apt-get -y install dirmngr patch rename curl libcurl4 unzip pkg-config ipset
+if [ "$ID" = "debian" ] && [ "$VERSION_ID" = "13" ]) then
+	apt-get -y install dirmngr patch rename curl unzip pkg-config ipset
+else
+	apt-get -y install dirmngr patch rename curl libcurl4 unzip pkg-config ipset
+fi
 
 if [ -z "$(dpkg-query -l | grep grub)" ]; then
 	if [ -d /boot/grub2 ]; then
@@ -567,7 +584,7 @@ if [ "$KERNEL" != "5.4" ]; then
 	make install
 	cd /tmp
 	rm -rf /tmp/mptcpize
-	if [ "$ID" = "debian" ] && [ "$VERSION_ID" = "13" ]; then
+	if [ "$ID" = "debian" ] && ([ "$VERSION_ID" = "12" ] || [ "$VERSION_ID" = "13" ]); then
 		apt-get -y install iproute2
 	else
 		echo "Compile and install iproute2..."
@@ -773,8 +790,8 @@ if [ "$OMR_ADMIN" = "yes" ]; then
 		apt-get -y remove python3-jwt
 		pip3 -q install pyjwt
 	else
-		if [ "$ID" = "debian" ] && ([ "$VERSION_ID" = "10" ] || [ "$VERSION_ID" = "11" ] || [ "$VERSION_ID" = "13" ]); then
-			if [ "$VERSION_ID" = "13" ]; then
+		if [ "$ID" = "debian" ] && ([ "$VERSION_ID" = "10" ] || [ "$VERSION_ID" = "11" ] || [ "$VERSION_ID" = "12" ] || [ "$VERSION_ID" = "13" ]); then
+			if [ "$VERSION_ID" = "12" ] || [ "$VERSION_ID" = "13" ]; then
 				apt-get -y --allow-downgrades install python3-passlib python3-jwt python3-netaddr libuv1
 				pip3 -q install uvloop --break-system-packages
 			else
@@ -790,7 +807,7 @@ if [ "$OMR_ADMIN" = "yes" ]; then
 	echo "If you see any error here, I really don't care: it's about a module not used for home users"
 	#pip3 install pyjwt passlib uvicorn fastapi netjsonconfig python-multipart netaddr
 	#pip3 -q install fastapi netjsonconfig python-multipart uvicorn -U
-	if [ "$ID" = "debian" ] && [ "$VERSION_ID" = "13" ]; then
+	if [ "$ID" = "debian" ] && ([ "$VERSION_ID" = "12" ] || [ "$VERSION_ID" = "13" ]); then
 		#pip3 -q install netjsonconfig --break-system-packages
 		pip3 -q install fastapi -U --break-system-packages
 		pip3 -q install jsonschema -U --break-system-packages
