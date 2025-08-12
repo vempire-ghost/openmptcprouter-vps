@@ -441,22 +441,9 @@ if [ "$KERNEL" = "5.4" ] || [ "$KERNEL" = "5.15" ]; then
 
     # Adicionar módulos essenciais ao initramfs para VMware
     echo "Adding essential modules to initramfs..."
-    if [ ! -f /etc/initramfs-tools/modules ]; then
-        touch /etc/initramfs-tools/modules
-    fi
-    
-    # Verifica se os módulos já existem no arquivo
-    if ! grep -q "mptspi" /etc/initramfs-tools/modules; then
-        echo "mptspi" >> /etc/initramfs-tools/modules
-    fi
-    
-    if ! grep -q "sd_mod" /etc/initramfs-tools/modules; then
-        echo "sd_mod" >> /etc/initramfs-tools/modules
-    fi
-    
-    if ! grep -q "ext4" /etc/initramfs-tools/modules; then
-        echo "ext4" >> /etc/initramfs-tools/modules
-    fi
+    echo "mptspi" >> /etc/initramfs-tools/modules
+    echo "sd_mod" >> /etc/initramfs-tools/modules
+    echo "ext4" >> /etc/initramfs-tools/modules
 
     # Atualizar initramfs para o kernel instalado
     echo "Updating initramfs for kernel ${KERNEL_RELEASE}..."
