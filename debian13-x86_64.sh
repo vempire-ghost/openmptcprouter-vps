@@ -447,7 +447,8 @@ if [ "$KERNEL" = "5.4" ] || [ "$KERNEL" = "5.15" ]; then
 
     # Atualizar initramfs para o kernel instalado
     echo "Updating initramfs for kernel ${KERNEL_RELEASE}..."
-    update-initramfs -u -k ${KERNEL_RELEASE}
+    #update-initramfs -u -k ${KERNEL_RELEASE}
+	update-initramfs -u -k 5.4.207-mptcp
 
     # Check if mptcp kernel is grub default kernel
     echo "Set MPTCP kernel as grub default..."
